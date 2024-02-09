@@ -9,8 +9,9 @@ import operator
 import string
 import mysql.connector
 import aspose.words as aw
-
-
+import requests
+import json
+import textract
 base_path = os.path.dirname(__file__)
 
 
@@ -113,12 +114,94 @@ class resumeparse(object):
                 return email[0].split()[0].strip(';')
             except IndexError:
                 return None
+    def check_email_in_database(self, email):
+        # Placeholder implementation, replace with your actual database check logic
+        # Example: Check if the email exists in a hypothetical 'emails' table in the database
+        connection = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='',
+            database='truetalent'
+        )
 
-    
+        cursor = connection.cursor()
+        query = "SELECT * FROM parser WHERE email = %s"
+        cursor.execute(query, (email,))
+        row = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        return row is not None
+
+    def save_file(self, file_path, destination_directory, new_filename):
+        try:
+            # Convert destination_directory to string if needed
+            destination_directory = str(destination_directory)
+
+            # Check if the directory exists, create it if not
+            if not os.path.exists(destination_directory):
+                os.makedirs(destination_directory)
+
+            # Ensure correct path separators
+            destination_path = os.path.join(destination_directory, new_filename)
+
+            print("Does destination_directory exist:", os.path.exists(destination_directory))
+            print("File path:", file_path)
+
+            if os.path.isfile(file_path):
+                shutil.copy(file_path, destination_path)
+                print("File saved successfully at", destination_path)
+            else:
+                print(f"Error: File not found at {file_path}")
+        except Exception as e:
+            print("Error in save_file:", str(e))
+
+
+
+    def save_file_to_database(self, file_path, destination_directory, new_filename, count_newfile, count_oldfile, count_dublicate, email):
+        # Check if the email already exists in the database
+        email_row = self.check_email_in_database(email)
+
+        if email_row:
+            print(f"Row with ID {email_row} exists:")
+            print(email_row)
+            count_oldfile += 1
+            self.save_file(file_path, destination_directory, new_filename)  # Use self to call instance method
+        else:
+            # Make a request to the PHP script for database interaction
+            php_script_url = "http://localhost/folder_parser/database.php"  # Update the URL accordingly
+            data = {
+                'email': email,
+                'row_newfile': str(count_newfile),
+                'row_oldfile': str(count_oldfile),
+                'row_dublicate': str(count_dublicate),
+            }
+
+            response = requests.post(php_script_url, data=json.dumps(data))
+
+            if response.status_code == 200:
+                result = response.json()
+                if 'status' in result:
+                    if result['status'] == 'existing':
+                        count_oldfile = int(result['row_oldfile'])
+                    elif result['status'] == 'new':
+                        count_newfile = int(result['row_newfile'])
+                else:
+                    print("Unexpected response from PHP script")
+            else:
+                print("Error communicating with PHP script. Status code:", response.status_code)
+
         
+
+        return count_newfile, count_oldfile, count_dublicate
+
+
+
+            
         
-    
-    def read_file(self, file, count_newfile, count_oldfile, count_dublicate, emailsave):
+    def read_file(self, file,destination_directory, count_newfile, count_oldfile, count_dublicate, emailsave):
+        
         """
         file : Give path of resume file
         docx_parser : Enter docx2txt or tika, by default is tika
@@ -131,6 +214,7 @@ class resumeparse(object):
         count_oldfile = int(count_oldfile)
         print(count_newfile, "864")
         file = os.path.join(file)
+        new_filename = os.path.basename(file)
         print("15")
         if file.endswith('docx'):
             print("in docx")
@@ -184,68 +268,12 @@ class resumeparse(object):
         found = False
         print(email, "882")
         
-
-        # host = 'localhost'
-        # user = 'root'
-        # password = 'sai@12pra'
-        # database = 'truetalent'
-        # connection = mysql.connector.connect(
-        # host=host,
-        # user=user,
-        # password=password,
-        # database=database
-        # )
-
-        # for emailnew in emailsave:
-        #     if emailnew == email:
-        #         found = True
-        #         break
-        # if not found:
-        #     emailsave.append(email)
-        #     cursor = connection.cursor()
-        #     query = "SELECT Email FROM email WHERE Email = %s"
-        #     cursor.execute(query, (email,))
-        #     row = cursor.fetchone()
-        #     if row:
-        #         print(f"Row with ID {email} exists:")
-        #         print(row)
-        #         count_oldfile +=1
-        #         file_path = file
-        #         destination_directory = "./Old files"
-        #         new_filename = file
-        #         save_file(file_path, destination_directory, new_filename)
-        #     else:
-        #         conn = mysql.connector.connect(
-        #         user='root',
-        #         password='sai@12pra',
-        #         host='localhost',
-        #         database='truetalent'
-        #         )
-        #         cursor = conn.cursor()
-        #         insert_query = "SELECT * FROM email_email"
-               
-        #         cursor.execute(insert_query)
-        #         rows = cursor.fetchall()
-        #         print(rows, "sql")
-        #         conn.commit
-        #         cursor.close()
-        #         conn.close()
+        count_newfile, count_oldfile, count_dublicate = self.save_file_to_database(
+            file, destination_directory, new_filename, count_newfile, count_oldfile, count_dublicate, email
+        )
 
 
-        #         print(f"Row with ID {email} does not exist.")
-        #         count_newfile += 1
-        #         file_path = file
-        #         destination_directory = "./New File"
-        #         new_filename = file
-        #         save_file(file_path, destination_directory, new_filename)
-        # else:
-        #     count_dublicate +=1
-        #     file_path = file
-        #     destination_directory = "./Old files"
-        #     new_filename = file
-        #     save_file(file_path, destination_directory, new_filename)
-        # print(emailsave)   
-
+       
         return {
             "email": email,
             "row_newfile": count_newfile,
@@ -254,4 +282,8 @@ class resumeparse(object):
         }
     def display(self):
         print("\n\n ========= Inside display() ========== \n\n")
+  
 parser_obj = resumeparse()
+
+
+
