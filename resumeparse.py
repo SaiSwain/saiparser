@@ -185,66 +185,66 @@ class resumeparse(object):
         print(email, "882")
         
 
-        host = 'localhost'
-        user = 'root'
-        password = 'raje123456@'
-        database = 'multi_threading'
-        connection = mysql.connector.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=database
-        )
+        # host = 'localhost'
+        # user = 'root'
+        # password = 'sai@12pra'
+        # database = 'truetalent'
+        # connection = mysql.connector.connect(
+        # host=host,
+        # user=user,
+        # password=password,
+        # database=database
+        # )
 
-        for emailnew in emailsave:
-            if emailnew == email:
-                found = True
-                break
-        if not found:
-            emailsave.append(email)
-            cursor = connection.cursor()
-            query = "SELECT Email FROM email WHERE Email = %s"
-            cursor.execute(query, (email,))
-            row = cursor.fetchone()
-            if row:
-                print(f"Row with ID {email} exists:")
-                print(row)
-                count_oldfile +=1
-                file_path = file
-                destination_directory = "./Old files"
-                new_filename = file
-                save_file(file_path, destination_directory, new_filename)
-            else:
-                conn = mysql.connector.connect(
-                user='root',
-                password='raje123456@',
-                host='localhost',
-                database='multi_threading'
-                )
-                cursor = conn.cursor()
-                insert_query = "SELECT * FROM email_email"
+        # for emailnew in emailsave:
+        #     if emailnew == email:
+        #         found = True
+        #         break
+        # if not found:
+        #     emailsave.append(email)
+        #     cursor = connection.cursor()
+        #     query = "SELECT Email FROM email WHERE Email = %s"
+        #     cursor.execute(query, (email,))
+        #     row = cursor.fetchone()
+        #     if row:
+        #         print(f"Row with ID {email} exists:")
+        #         print(row)
+        #         count_oldfile +=1
+        #         file_path = file
+        #         destination_directory = "./Old files"
+        #         new_filename = file
+        #         save_file(file_path, destination_directory, new_filename)
+        #     else:
+        #         conn = mysql.connector.connect(
+        #         user='root',
+        #         password='sai@12pra',
+        #         host='localhost',
+        #         database='truetalent'
+        #         )
+        #         cursor = conn.cursor()
+        #         insert_query = "SELECT * FROM email_email"
                
-                cursor.execute(insert_query)
-                rows = cursor.fetchall()
-                print(rows, "sql")
-                conn.commit
-                cursor.close()
-                conn.close()
+        #         cursor.execute(insert_query)
+        #         rows = cursor.fetchall()
+        #         print(rows, "sql")
+        #         conn.commit
+        #         cursor.close()
+        #         conn.close()
 
 
-                print(f"Row with ID {email} does not exist.")
-                count_newfile += 1
-                file_path = file
-                destination_directory = "./New File"
-                new_filename = file
-                save_file(file_path, destination_directory, new_filename)
-        else:
-            count_dublicate +=1
-            file_path = file
-            destination_directory = "./Old files"
-            new_filename = file
-            save_file(file_path, destination_directory, new_filename)
-        print(emailsave)   
+        #         print(f"Row with ID {email} does not exist.")
+        #         count_newfile += 1
+        #         file_path = file
+        #         destination_directory = "./New File"
+        #         new_filename = file
+        #         save_file(file_path, destination_directory, new_filename)
+        # else:
+        #     count_dublicate +=1
+        #     file_path = file
+        #     destination_directory = "./Old files"
+        #     new_filename = file
+        #     save_file(file_path, destination_directory, new_filename)
+        # print(emailsave)   
 
         return {
             "email": email,
