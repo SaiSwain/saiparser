@@ -33,7 +33,7 @@ const App = () => {
             setnewfilecount(data.new_count);
             setoldfilecount(data.old_count);
             setdublicateCount(data.dublicate_count)
-            setprogress(Math.round((data.current_count/data.total_count)*100))
+            setprogress(Math.round((data.current_count / data.total_count) * 100))
         });
         socket.on('parse_complete', data => {
             // Handle completion if needed
@@ -76,7 +76,7 @@ const App = () => {
         }
     };
 
-    const handlechange = (e) =>{
+    const handlechange = (e) => {
         const files = e.target.files;
         setseletedfile(files)
         const pdfFiles = Array.from(files).filter(file => file.type === 'application/pdf');
@@ -98,87 +98,114 @@ const App = () => {
     }
     const handleClick = () => {
         window.location.reload();
-      };
-        
+    };
+
 
     return (
 
-      <div>
         <div>
-          <Navbar/>
-        </div>
-        <div className='nav-bar'>
-          <div className='nav-div'>
-                <div className='upload-main'>
-                    <div className='upload-main-div'>
-                    <div className='upload-resume'>
-                        <div>
-                        <div>
-                             <img src='https://truetalent.io/Assets/svgs/upload.svg' />
-                             <input type="file" id="resumeFile" name="files[]" accept=".pdf,.doc,.docx,.rtf,.txt" directory="" webkitdirectory="" onChange={handlechange} multiple required 
-                             style={{color : seletedfile ? "#14BC9A" : "white"}}>
-                                </input>
-                           
-                        </div>
-                        
-                        </div>
-                    </div>
-                    <div className='upload-buut-div'>
-                        <button type="submit" className='upload-button' onClick={handleParseResume}>Parse Folder</button>
-                    </div>
-                    </div>
-                    <div>
-                    <div className='tot-div'>
-                        <h2 className='tot-txt'>Total No. of Files Uploaded: {no_files}</h2>
-                        {no_files == 0 ? <div></div> : <div className='para-div'>
-                          <p className='para-txt para-text'>(pdf files: {pdffiles}</p>
-                          <p className='para-txt'>doc files: {docfiles}</p>
-                          <p className='para-txt'>docx files: {docxfiles}</p>
-                          <p className='para-txt'>Rtf files: {rtffiles}</p>
-                          <p className='para-txt'>txt files: {txtfiles})</p>
-                          </div>}
-                    </div>
-                    {no_files == 0 ? <div></div> :
-                    <div>
-                    <ProgressBar completed={progress} 
-                    baseBgColor='#efcfcf'
-                    bgColor='#14BC9A'
-                    height='15px'
-                    width='50%'
-                    />
-                    </div>
-                    
-                    }
-                    
-                    <div>
-                    <div className="flies-count">
-            <p>Number of unique files: {newfilecount}</p>
-            <p>Number of files pre-exsist in TT-Database: {oldfilecount}</p>
-            <p>Number of dublicate files in this batch: {dublicateCount}</p>
-          </div>
-
-          <div className="flies-count">
-            <p>
-              {
-                progress == 100 ? <p>
-                   TT Cash eligiblity = {newfilecount * 5}
-                </p> : ""
-              }
-             
-            </p>
-            <div className="ttcash-button">
-            <button className="tt-decline-btn" onClick={handleClick}>Accept</button>
-            <button className="tt-accept-btn" onClick={handleClick}>Decline</button>
+            <div>
+                <Navbar />
             </div>
-            </div>
-                    </div>
-                    </div>
-                    
+            <div className='nav-bar'>
+                <div className='nav-div'>
+                    <div className='upload-main'>
+                        <div className='upload-main-div'>
+                            <div className='upload-resume'>
+                                <div>
+                                    <div>
+                                        <img src='https://truetalent.io/Assets/svgs/upload.svg' className='img-upload'/>
+                                        <input type="file" id="resumeFile" name="files[]" accept=".pdf,.doc,.docx,.rtf,.txt" directory="" webkitdirectory="" onChange={handlechange} multiple required
+                                            style={{ color: seletedfile ? "#14BC9A" : "white" }} className='choose-bttn'>
+                                        </input>
 
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div className='upload-buut-div'>
+                                <button type="submit" className='upload-button' onClick={handleParseResume}>Parse Folder</button>
+                            </div>
+                        </div>
+                        <div className='center-middle'>
+                            <div className='center'>
+                            <div className='tot-div'>
+                                {/* <h2 className='tot-txt font-size'>Total No. of Files Uploaded: {no_files}</h2> */}
+                                <div>
+                                    <label className='font-size'>Total No. of Files Uploaded: </label> <br/>
+                                    <input value={no_files} className='input-value'></input>
+                                </div>
+                                {no_files == 0 ? <div></div> : <div className='para-div'>
+                                    <p className='para-txt para-text'>(pdf files: {pdffiles}</p>
+                                    <p className='para-txt'>doc files: {docfiles}</p>
+                                    <p className='para-txt'>docx files: {docxfiles}</p>
+                                    <p className='para-txt'>Rtf files: {rtffiles}</p>
+                                    <p className='para-txt'>txt files: {txtfiles})</p>
+                                </div>}
+                            </div>
+                            {no_files == 0 ? <div></div> :
+                                <div>
+                                    <ProgressBar completed={progress}
+                                        baseBgColor='#efcfcf'
+                                        bgColor='#14BC9A'
+                                        height='10px'
+                                        width='48.5%'
+                                        labelSize="9px"
+                                    />
+                                </div>
+
+                            }
+
+                            <div>
+                                <form className='count-value'>
+                                    <div>
+                                    <div>
+                                        <label className='font-size'>Number of unique files:</label> <br/>
+                                        <input value={newfilecount} className='input-value'></input>
+                                    </div>
+                                    <div>
+                                        <label className='font-size'>Number of files pre-exsist in TT-Database: </label> <br/>
+                                        <input value={oldfilecount} className='input-value'></input>
+                                    </div>
+                                    <div>
+                                        <label className='font-size'>Number of dublicate files in this batch: </label> <br/>
+                                        <input value={dublicateCount} className='input-value'></input>
+                                    </div>
+                                    </div>
+                                </form>
+                                {/* <div className="flies-count">
+                                    <p className='font-size'>Number of unique files: {newfilecount}</p>
+                                    <p className='font-size'>Number of files pre-exsist in TT-Database: {oldfilecount}</p>
+                                    <p className='font-size'>Number of dublicate files in this batch: {dublicateCount}</p>
+                                </div> */}
+
+                                <div className="flies-count count-value1">
+                                    <div>
+                                    <p>
+                                        {
+                                            progress == 100 ? 
+                                            <div>
+                                                <label className='font-size'>TT Cash eligiblity: </label> <br/>
+                                                <input value={newfilecount * 5} className='input-value'></input>
+                                            </div>
+                                            : ""
+                                        }
+                                    </p>
+                                    <div className="ttcash-button">
+                                        <button className="tt-decline-btn" onClick={handleClick}>Accept</button>
+                                        <button className="tt-accept-btn" onClick={handleClick}>Decline</button>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
+
+                    </div>
                 </div>
+
             </div>
-            
-        </div>
         </div>
 
     );
